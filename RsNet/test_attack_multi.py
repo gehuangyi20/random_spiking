@@ -72,11 +72,6 @@ def generate_data(data, models_pred, models_idx, samples, targeted=True, start=0
         ref_pred.append(models_pred[model_i][data_type])
 
     tmp_pred = np.argmax(ref_pred, axis=2)
-    print(np.shape(ref_pred), np.shape(tmp_pred))
-    print(tmp_pred)
-    for __pred in tmp_pred:
-        cur_acc = __pred[ref_idx] == np.argmax(ref_label, axis=1)
-        print("axx_count", np.sum(cur_acc))
 
     label_count = ref_label.shape[1]
     ref_pred = np.argpartition(ref_pred, label_count - target_exclude_topk, axis=2)
