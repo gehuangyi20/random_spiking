@@ -57,11 +57,11 @@ The script converts the cifar data into mnist format.
 ```Bash
 python3 RsNet/gen_script_att_and_verify.py --dir=run_script/[dataset]/ -c sample_training.json -o sh_sample_train_
 ```
-Note ```[dataset]``` can be ```mnist```, ```fashion```, or ```cifar```.
+> Note ```[dataset]``` can be ```mnist```, ```fashion```, or ```cifar```.
 
 - Train models from scratch
 ```Bash
-run_script/[dataset]/sh_sample_train_models.sh
+bash run_script/[dataset]/sh_sample_train_models.sh
 ```
 The script to train 4 models for each training methods using random selected half dataset.
 The sample script provides ```standard``` and ```rs1_nodropout```. 
@@ -72,8 +72,12 @@ By default, the script place the program on the first GPU. If you have multiple 
 ```--gpu_idx=[idx]``` in the script file in order to place the program running on other GPUs.
 The saved model can be found in directory ```result_[dataset]/models_sample```.
 
-Sample models can be downloaded at 
-
+- Download sample models
+Since training models from scratch takes so much time, we release sample models which
+can be downloaded by running following command
+```Bash
+run_script/sample_download_models.sh [dataset]
+```
 
 ### 4. Model Accuracy
 - Generate model acc verification script
@@ -84,21 +88,21 @@ python3 RsNet/gen_script_att_and_verify.py --dir=run_script/[dataset]/ -c sample
 - Evaluate and statistic model accuarcy
 ```Bash
 # run and stat the model acc
-run_script/[dataset]/sh_sample_verify_models.sh
-run_script/sample_stat_model_acc.sh [dataset]
+bash run_script/[dataset]/sh_sample_verify_models.sh
+bash run_script/sample_stat_model_acc.sh [dataset]
 ```
 The result of model accuracy can be found in the directory ```result_[dataset]/models_acc_sample/summary.csv```
 
 ### 5. Generate Adversarial Examples
 - Initial adversarial examples saving directory and create adversarial examples generation script
 ```Bash
-run_script/sample_stat_model_acc.sh [dataset]
+bash run_script/sample_stat_model_acc.sh [dataset]
 ```
 
 - Generate the adversarial examples
 ```Bash
-run_script/[dataset]/sh_sample_att_single.sh
-run_script/[dataset]/sh_sample_att_multi.sh
+bash run_script/[dataset]/sh_sample_att_single.sh
+bash run_script/[dataset]/sh_sample_att_multi.sh
 ```
 Generated adversarial examples can be found in the directory ```[dataset]_data/sample_attack_*```
 
@@ -112,7 +116,7 @@ If you want to attack multi-target models and place them on different GPUs, then
 ### 6. White Box Evaluation
 - Run following script to evaluate whitebox attack
 ```Bash
-run_script/sample_stat_adv_white_box.sh [dataset]
+bash run_script/sample_stat_adv_white_box.sh [dataset]
 ```
 
 - The evaluation result can be found in the directory ```result_[dataset]/data_sum/sample_[single or multi]```
@@ -126,20 +130,20 @@ $L_p$ distance, and etc
 ### 7. Model Stability
 - Initial model stability saving directory and create model stability evaluation script
 ```Bash
-run_script/sample_gen_model_stable_script.sh [dataset]
+bash run_script/sample_gen_model_stable_script.sh [dataset]
 ```
 
 - Evaluate model stability
 ```Bash
 # Evaluating model stability with Gaussian Noise
-run_script/[dataset]/sh_sample_stability_noise.sh
+bash run_script/[dataset]/sh_sample_stability_noise.sh
 # Evaluating model stability with JPEG compression
-run_script/[dataset]/sh_sample_stability_noise_jpeg.sh
+bash run_script/[dataset]/sh_sample_stability_noise_jpeg.sh
 ```
 
 - Stat model stability
 ```Bash
-run_script/sample_stat_model_stability.sh [dataset]
+bash run_script/sample_stat_model_stability.sh [dataset]
 ```
 
 - The result of model stability can be found in the directory ```result_[dataset]/models_[noise or jpeg]_sample```
@@ -151,7 +155,7 @@ run_script/sample_stat_model_stability.sh [dataset]
 ### 8. Gray Box Evaluation
 - Verify the transferability of adversarial examples
 ```Bash
-run_script/sample_eval_adv_trans_script.sh [dataset]
+bash run_script/sample_eval_adv_trans_script.sh [dataset]
 ```
 
 The result can be found in the directory 
