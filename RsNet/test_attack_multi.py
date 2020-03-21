@@ -164,28 +164,10 @@ if __name__ == "__main__":
     parser.add_argument('--fgm_eps', help='fgm epsilonepsilon', type=float, default=0.3)
     parser.add_argument('--is_det_joint', help='whether use one threshold for all detectors', type=str, default='no')
     parser.add_argument('--eval_lab', help='the raw prediction output', type=str, default='no')
-    parser.add_argument('--palette_shade', help='train image with color palette, cubic of [2-6] colors, default: -1, '
-                                                'disable this feature', type=int, default=-1)
     parser.add_argument('--boxmin', help='model input image value min', type=float, default=0)
     parser.add_argument('--boxmax', help='model input image value max', type=float, default=1.0)
-    parser.add_argument('--model_arch_name', help='model name used for imagenet', type=str, default='inception_v3')
     parser.add_argument('--top_k', help='exclude top_k attack target', type=int, default=1)
     parser.add_argument('--att_label_num', help='attack label count', type=int, default=1)
-    parser.add_argument('--imagenet_image_size', help='imagenet image size', type=int, default=224)
-    parser.add_argument('--preprocess_name', help='preprocess function name', type=str, default=None)
-    parser.add_argument('--intra_op_parallelism_threads',
-                        help="""Nodes that can use multiple threads to 
-                        parallelize their execution will schedule the 
-                        individual pieces into this pool.
-                        Default value 1 avoid pool of Eiden threads""",
-                        type=int, default=1)
-    parser.add_argument('--inter_op_parallelism_threads', help="""All ready nodes are scheduled in this pool.""",
-                        type=int, default=5)
-    parser.add_argument('--num_parallel_calls', help="The level of parallelism for data "
-                                                     "preprocessing across multiple CPU cores",
-                        type=int, default=5)
-    parser.add_argument('--fp16', help="""Train using float16 (half) precision instead of float32.""",
-                        type=str, default='yes')
 
     args = parser.parse_args()
 
@@ -223,14 +205,10 @@ if __name__ == "__main__":
     is_det_joint = args.is_det_joint == 'yes'
     eval_lab = args.eval_lab.split(",")
 
-    palette_shade = args.palette_shade
     boxmin = args.boxmin
     boxmax = args.boxmax
     top_k = args.top_k
-    model_arch_name = args.model_arch_name.split(',')
     att_label_num = args.att_label_num
-    image_size = args.imagenet_image_size
-    dtype = tf.float16 if args.fp16 == 'yes' else tf.float32
     gpu_config.gpu_options.per_process_gpu_memory_fraction = args.gpu_mem
 
     fgm_eps = args.fgm_eps
@@ -238,12 +216,6 @@ if __name__ == "__main__":
     setup_visibile_gpus(",".join(map(str, gpu_idx)))
     selected_gpus = list(range(len(gpu_idx)))
     gpu_count = len(gpu_idx)
-
-    if palette_shade == -1:
-        palette_shade = None
-    elif palette_shade > 6 or palette_shade < 2:
-        print("Error: invalid palette shade value", palette_shade, ". Possible value [-1, 2-6]")
-        exit(0)
 
     if set_name == 'mnist':
         model_meta = model_mnist_meta
@@ -280,12 +252,9 @@ if __name__ == "__main__":
         for _model_name in target_model_names:
             with tf.device('/gpu:' + str(gpu_i % gpu_count)):
                 _path = os.path.join(target_model_dir, _model_name)
-                model_arch = model_arch_name[gpu_i] if len(model_arch_name) > gpu_i else None
                 models.append(MODEL(_path, sess,
                                     input_data_format=data_format, data_format=data_format,
-                                    dropout=dropout, rand_params=para_random_spike, is_batch=True,
-                                    palette_shade=palette_shade, model_name=model_arch, image_size=image_size,
-                                    dtype=dtype))
+                                    dropout=dropout, rand_params=para_random_spike, is_batch=True))
                 models_idx.append(utils.load_model_idx(_path))
                 gpu_i += 1
 
@@ -415,22 +384,21 @@ if __name__ == "__main__":
         ref_idx = ref_idx[start:start + sample_size]
         ref_idx.sort()
         # generate targeted attack data
-        if set_name != 'imagenet':
-            inputs, targets, raw_targets, orig_idx = generate_data(
-                data, models_pred, models_idx, samples=sample_size,
-                targeted=targeted,
-                start=start, imagenet=False, is_test_data=is_test_data,
-                is_rand=is_rand, target_random=target_rand,
-                random_count=att_label_num, ref_idx=ref_idx,
-                target_exclude_topk=args.top_k)
-            print(inputs.dtype, targets.dtype, raw_targets.dtype)
-            # save orig idx
-            utils.save_obj(orig_idx, name=attack_name + "-idx", directory=out_dir)
-        else:
-            orig_idx = []
+
+        inputs, targets, raw_targets, orig_idx = generate_data(
+            data, models_pred, models_idx, samples=sample_size,
+            targeted=targeted,
+            start=start, imagenet=False, is_test_data=is_test_data,
+            is_rand=is_rand, target_random=target_rand,
+            random_count=att_label_num, ref_idx=ref_idx,
+            target_exclude_topk=args.top_k)
+        print(inputs.dtype, targets.dtype, raw_targets.dtype)
+        # save orig idx
+        utils.save_obj(orig_idx, name=attack_name + "-idx", directory=out_dir)
+
 
         # save the attack image and miss-classified label into the file
-        input_len = len(inputs) if set_name != 'imagenet' else data.data_len()
+        input_len = len(inputs)
         config[attack_name + "-count"] = input_len * 3
         config_fp = open(out_dir + "/config.json", "wb")
         config_str = json.dumps(config)
@@ -439,18 +407,9 @@ if __name__ == "__main__":
 
         for i in range(0, input_len, batch_size):
             i_end = i + batch_size if i + batch_size <= input_len else input_len
-            if set_name == 'imagenet':
-                batch_inputs, batch_raw_targets, batch_targets, batch_orig_idx = data.next_batch()
-                print(np.argmax(batch_raw_targets, axis=1))
-                print(np.argmax(batch_targets, axis=1))
-                print(batch_orig_idx)
-                if not targeted:
-                    batch_targets = batch_raw_targets
-                orig_idx.extend(batch_orig_idx)
-            else:
-                batch_inputs = inputs[i:i_end]
-                batch_targets = targets[i:i_end]
-                batch_raw_targets = raw_targets[i:i_end]
+            batch_inputs = inputs[i:i_end]
+            batch_targets = targets[i:i_end]
+            batch_raw_targets = raw_targets[i:i_end]
             batch_adv = attack.attack(batch_inputs, batch_targets,
                                       input_data_format=data_format, output_data_format=data_format)
             cur_batch_size = i_end - i
@@ -507,10 +466,6 @@ if __name__ == "__main__":
         timeend = time.time()
 
         print("Took", timeend - timestart, "seconds to run", input_len, "samples.")
-
-        if set_name == 'imagenet':
-            orig_idx = np.squeeze(orig_idx)
-            utils.save_obj(orig_idx, name=attack_name + "-idx", directory=out_dir)
 
         attack_stream.close()
         attack_label.close()

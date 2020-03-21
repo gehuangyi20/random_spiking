@@ -167,7 +167,7 @@ for i in range(0, count):
         big_im.paste(im, ((img_width + margin)*col, (img_height + margin)*row))
     print(col_tmpl % buf_label, end='')
 
-    if col + 1 == col_len:
+    if col // (3 if show_diff else 1) + 1 == col_len:
         print()
 
 if count % col_len:
