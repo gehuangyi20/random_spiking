@@ -1,0 +1,55 @@
+{
+    "g_options": [
+       "python3 RsNet/rand_dir_inference.py",
+        "--gpu_idx=0",
+        "--is_logits=no",
+        "--data_dir=mnist_data",
+        "--data_name=data",
+        "--model_dir=result_mnist/models_sample",
+        "--batch_size=32",
+        "--set_name=mnist",
+        "--data_format=channels_first",
+        "--noise_iter=20 --test_data_start=0 --test_data_len=100"
+    ],
+    "task":[
+        {
+            "name": "noise",
+            "options": [],
+            "iter_options": ["0", "1", "2", "3", "4", "5"]
+        }
+    ],
+    "sub_task":[
+        {
+            "name": "standard",
+            "model":[{
+                "prefix": "--model_name=",
+                "format": "mnist_standard_%d",
+                "arg": ["d"]
+            }],
+            "model_len": 4,
+            "options": ["--iteration=1", "--dropout=0", "--rspike_para=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0", "--bagging=False"],
+            "iter": [
+                {
+                    "format": "--noise_distance=%s --output_file=result_mnist/models_noise_sample/standard/%s.csv",
+                    "arg": ["o", "o"]
+                }
+            ]
+        },
+        {
+            "name": "rs1_nodropout",
+            "model":[{
+                "prefix": "--model_name=",
+                "format": "mnist_rs1_nodropout_%d",
+                "arg": ["d"]
+            }],
+            "model_len": 4,
+            "options": ["--iteration=10", "--dropout=0", "--rspike_para=0.2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0", "--bagging=True"],
+            "iter": [
+                {
+                    "format": "--noise_distance=%s --output_file=result_mnist/models_noise_sample/rs1_nodropout/%s.csv",
+                    "arg": ["o", "o"]
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,115 @@
+{
+    "g_options": [
+        "python3 RsNet/train_cifar_models.py",
+        "--gpu_idx=0,",
+        "--data_dir=cifar_data",
+        "--data_name=data",
+        "--model_dir=result_cifar/models_splits",
+        "--validation_size=2500",
+        "--train_sel_rand=yes",
+        "--train_size=22500",
+        "--data_format=channels_first",
+        "--rotation=10"
+    ],
+    "task":[
+        {
+            "name": "models",
+            "options": [],
+            "iter_options": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9" , "10", "11", "12", "13", "14", "15"]
+        }
+    ],
+    "sub_task":[
+        {
+            "name": "standard",
+            "model":[],
+            "model_len": 0,
+            "options": ["--dropout=0",  "--random_spike=0", "--is_dis=no"],
+            "iter": [
+                {
+                    "format": "--model_name=cifar_wrn_28_10_standard_%s",
+                    "arg": ["o"]
+                }
+            ]
+        },
+        {
+            "name": "dropout",
+            "model":[],
+            "model_len": 0,
+            "options": ["--dropout=0.1",  "--random_spike=0", "--is_dis=no"],
+            "iter": [
+                {
+                    "format": "--model_name=cifar_wrn_28_10_dropout_%s",
+                    "arg": ["o"]
+                }
+            ]
+        },
+        {
+            "name": "distillation",
+            "model":[],
+            "model_len": 0,
+            "options": ["--dropout=0.1",  "--random_spike=0", "--is_dis=yes"],
+            "iter": [
+                {
+                    "format": "--model_name=cifar_wrn_28_10_dis_%s",
+                    "arg": ["o"]
+                }
+            ]
+        },
+        {
+            "name": "adv dropout",
+            "model":[],
+            "model_len": 0,
+            "options": ["--dropout=0.1",  "--random_spike=0", "--is_dis=no"],
+            "iter": [
+                {
+                    "format": "--model_name=cifar_wrn_28_10_dropout_adv_%s --ex_data_dir=%s/data/data_attack_adv_train_l2_dropout --ex_data_name=attack_%s --ex_data_size=2500 --ex_data_sel_rand=0",
+                    "arg": ["o", "p", "o"]
+                },
+                {
+                    "format": "--pre_idx=%s/models/cifar_wrn_28_10_dropout_%s",
+                    "arg": ["p", "o"]
+                }
+            ]
+        },
+        {
+            "name": "rs1_nodropout",
+            "model":[],
+            "model_len": 0,
+            "options": ["--dropout=0",  "--random_spike=1", "--is_dis=no"],
+            "iter": [
+                {
+                    "format": "--model_name=cifar_wrn_28_10_rs1_nodropout_%s",
+                    "arg": ["o"]
+                }
+            ]
+        },
+        {
+            "name": "rs1_dropout",
+            "model":[],
+            "model_len": 0,
+            "options": ["--dropout=0.1",  "--random_spike=1", "--is_dis=no"],
+            "iter": [
+                {
+                    "format": "--model_name=cifar_wrn_28_10_rs1_dropout_%s",
+                    "arg": ["o"]
+                }
+            ]
+        },
+        {
+            "name": "rs1_nodropout_adv",
+            "model":[],
+            "model_len": 0,
+            "options": ["--dropout=0",  "--random_spike=1", "--is_dis=no"],
+            "iter": [
+                {
+                    "format": "--model_name=cifar_wrn_28_10_rs1_nodropout_adv_%s --ex_data_dir=%s/data/data_attack_adv_train_l2_rs1_nodropout --ex_data_name=attack_%s --ex_data_size=2500 --ex_data_sel_rand=0",
+                    "arg": ["o", "p", "o"]
+                },
+                {
+                    "format": "--pre_idx=%s/models/cifar_wrn_28_10_rs1_nodropout_%s",
+                    "arg": ["p", "o"]
+                }
+            ]
+        }
+    ]
+}

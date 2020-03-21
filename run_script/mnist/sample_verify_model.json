@@ -1,0 +1,48 @@
+{
+    "g_options": [
+        "python3 RsNet/verify_models.py",
+        "--gpu_idx=0",
+        "--is_logits=no",
+        "--data_dir=mnist_data",
+        "--data_name=data",
+        "--model_dir=result_mnist/models_sample",
+        "--batch_size=32",
+        "--set_name=mnist",
+        "--bagging=yes",
+        "--data_format=channels_first",
+        "--det_model_dir=result_mnist/models_magnet_sample"
+    ],
+    "task":[
+        {
+            "name": "models",
+            "options": [],
+            "iter_options": ["0", "1", "2", "3"]
+        }
+    ],
+    "sub_task":[
+        {
+            "name": "standard",
+            "model":[],
+            "model_len": 0,
+            "options": ["--iteration=1", "--dropout=0",  "--random_spike=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"],
+            "iter": [
+                {
+                    "format": "--model_name=mnist_standard_%s --output_file=result_mnist/models_acc_sample/standard/%s.csv",
+                    "arg": ["o", "o"]
+                }
+            ]
+        },
+        {
+            "name": "rs1_nodropout",
+            "model":[],
+            "model_len": 0,
+            "options": ["--iteration=10", "--dropout=0",  "--random_spike=0.2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0"],
+            "iter": [
+                {
+                    "format": "--model_name=mnist_rs1_nodropout_%s --output_file=result_mnist/models_acc_sample/rs1_nodropout/%s.csv",
+                    "arg": ["o", "o"]
+                }
+            ]
+        }
+    ]
+}

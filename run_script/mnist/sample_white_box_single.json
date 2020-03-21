@@ -1,0 +1,15 @@
+{
+    "conf": ["0", "5"],
+    "id": ["0"],
+    "name": ["sample_attack_l2_nodropout", "sample_attack_l2_rs1_nodropout"],
+    "set_name": "mnist",
+    "att_dir": "../mnist_data/data",
+    "att_name_rel_path": "../",
+    "att_name_prefix": "attack",
+    "sum_out": "../summary",
+    "show_img_start": "2",
+    "show_img_num": "10",
+    "show_img_col": "5",
+    "show_img_step": "3",
+    "show_img_duplicate": "1"
+}

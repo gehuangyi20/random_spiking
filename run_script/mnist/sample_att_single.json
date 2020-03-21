@@ -1,0 +1,67 @@
+{
+    "g_options": [
+        "python3 RsNet/test_attack_multi.py",
+        "--gpu_idx=0,",
+        "--data_dir=mnist_data",
+        "--start=0",
+        "--num=10",
+        "--model_dir=result_mnist/models_sample",
+        "--batch_size=10",
+        "--set_name=mnist",
+        "--is_targeted=yes",
+        "--is_test=yes",
+        "--is_data_rand=yes",
+        "--is_target_rand=yes",
+        "--att_mthd=l2",
+        "--data_format=channels_first",
+        "--cw_iter=1000"
+    ],
+    "task":[
+        {
+            "name": "single",
+            "options": [],
+            "iter_subtask": ["0"],
+            "iter_options": ["0", "5"],
+            "iter": [
+                {
+                    "format": "--attack_name=attack_%s_%s",
+                    "arg": ["s", "o"]
+                },
+                {
+                    "format": "--cw_confidence=%s",
+                    "arg": ["o"]
+                }
+            ]
+        }
+    ],
+    "sub_task":[
+        {
+            "name": "standard",
+            "model": [],
+            "model_len": 1,
+            "options": [
+                "--data_name=sample_attack_l2_nodropout"
+            ],
+            "iter":[
+                {
+                    "format": "--model_name=mnist_standard_%s --eval_lab=result_mnist/models_acc_sample/standard/%s_raw",
+                    "arg": ["s", "s"]
+                }
+            ]
+        },
+        {
+            "name": "rs1 nodropout",
+            "model": [],
+            "model_len": 1,
+            "options": [
+                "--data_name=sample_attack_l2_rs1_nodropout --cw_l2_eot_count=1 --dropout=0 --random_spike=0.2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
+            ],
+            "iter":[
+                {
+                    "format": "--model_name=mnist_rs1_nodropout_%s --eval_lab=result_mnist/models_acc_sample/rs1_nodropout/%s_raw",
+                    "arg": ["s", "s"]
+                }
+            ]
+        }
+    ]
+}

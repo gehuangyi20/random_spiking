@@ -1,0 +1,78 @@
+{
+    "g_options": [
+        "python3 RsNet/verify_adv_transfer.py",
+        "--gpu_idx=0",
+        "--is_logits=no",
+        "--data_dir=cifar_data/",
+        "--model_dir=result_cifar/models_sample",
+        "--batch_size=32",
+        "--set_name=cifar10",
+        "--is_targeted=yes",
+        "--bagging=yes",
+        "--data_format=channels_first"
+    ],
+    "task": [
+        {
+            "name": "standard",
+            "options": [
+                "--data_name=sample_attack_l2_nodropout"
+            ],
+            "iter_subtask": ["0"],
+            "iter_options": ["0", "20"],
+            "iter": [
+                {
+                    "format": "--attack_name=attack_%s_%s",
+                    "arg": ["s", "o"]
+                }
+            ]
+        },
+        {
+            "name": "rs1_nodropout",
+            "options": [
+                "--data_name=sample_attack_l2_rs1_nodropout"
+            ],
+            "iter_subtask": ["0"],
+            "iter_options": ["0", "20"],
+            "iter": [
+                {
+                    "format": "--attack_name=attack_%s_%s",
+                    "arg": ["s", "o"]
+                }
+            ]
+        }
+    ],
+    "sub_task":[
+        {
+            "name": "standard",
+            "model":[{
+                "prefix": "--model_name=",
+                "format": "cifar_wrn_28_10_standard_%d",
+                "arg": ["d"]
+            }],
+            "model_len": 4,
+            "options": ["--iteration=1", "--dropout=0", "--random_spike=0"],
+            "iter": [
+                {
+                    "format": "--output_file=result_cifar/sample_result_cross/cross_%s/trans_nodropout_%s/standard_transferability_attack_l2_0_%s.csv",
+                    "arg": ["tn", "s", "o"]
+                }
+            ]
+        },
+        {
+            "name": "rs1 nodropout",
+            "model":[{
+                "prefix": "--model_name=",
+                "format": "cifar_wrn_28_10_rs1_nodropout_%d",
+                "arg": ["d"]
+            }],
+            "model_len": 4,
+            "options": ["--iteration=10", "--dropout=0",  "--random_spike=1"],
+            "iter": [
+                {
+                    "format": "--output_file=result_cifar/sample_result_cross/cross_%s/trans_rs1_nodropout_%s/standard_transferability_attack_l2_0_%s.csv",
+                    "arg": ["tn", "s", "o"]
+                }
+            ]
+        }
+    ]
+}

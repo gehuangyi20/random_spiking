@@ -1,0 +1,50 @@
+{
+    "g_options": [
+        "python3 RsNet/train_models.py",
+        "--gpu_idx=0",
+        "--data_dir=mnist_data",
+        "--data_name=data",
+        "--model_dir=result_mnist/models_sample",
+        "--validation_size=0",
+        "--train_sel_rand=no",
+        "--train_size=60000",
+        "--random_spike_batch=yes",
+        "--is_data_gen=yes",
+        "--data_format=channels_first",
+        "--rotation=10"
+    ],
+    "task":[
+        {
+            "name": "models",
+            "options": [],
+            "iter_options": ["0", "1", "2", "3"]
+        }
+    ],
+    "sub_task":[
+        {
+            "name": "standard",
+            "model":[],
+            "model_len": 0,
+            "options": ["--dropout=0",  "--random_spike=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0", "--is_dis=no"],
+            "iter": [
+                {
+                    "format": "--model_name=mnist_standard_%s",
+                    "arg": ["o"]
+                }
+            ]
+        },
+
+        {
+            "name": "rs1_nodropout",
+            "model":[],
+            "model_len": 0,
+            "options": ["--dropout=0",  "--random_spike=0.2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0", "--is_dis=no"],
+            "iter": [
+                {
+                    "format": "--model_name=mnist_rs1_nodropout_%s",
+                    "arg": ["o"]
+                }
+            ]
+        }
+    ]
+}
