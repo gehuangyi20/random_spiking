@@ -17,6 +17,10 @@ which generalizes dropout and introduces random noises in the training process i
 Evaluations under our proposed framework suggest RS delivers better protection against adversarial
 examples than many existing schemes.
 
+## Random spiking layer
+The implementation of random spiking layer can be found in 
+[RsNet/random_spiking/nn_ops.py](RsNet/random_spiking/nn_ops.py)
+
 ## Usage
 Please see [INSTRUCTIONS.md](Instruction.md) for the usage.
 

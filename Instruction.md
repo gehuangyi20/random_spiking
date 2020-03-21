@@ -26,6 +26,9 @@ pip3 install tensorflow-gpu==v1.13.1
 pip3 install keras==v2.3.1
 pip3 install easydict matplotlib Pillow
 
+# make RsNet to be accessible in current environment
+ln -s ../../../../RsNet/ nn_defense/lib/python3.6/site-packages/RsNet
+
 # exist envirnoment
 deactivate
 ```
@@ -72,7 +75,8 @@ By default, the script place the program on the first GPU. If you have multiple 
 ```--gpu_idx=[idx]``` in the script file in order to place the program running on other GPUs.
 The saved model can be found in directory ```result_[dataset]/models_sample```.
 
-- Download sample models
+- Download **sample models**
+
 Since training models from scratch takes so much time, we release sample models which
 can be downloaded by running following command
 ```Bash
@@ -89,14 +93,14 @@ python3 RsNet/gen_script_att_and_verify.py --dir=run_script/[dataset]/ -c sample
 ```Bash
 # run and stat the model acc
 bash run_script/[dataset]/sh_sample_verify_models.sh
-bash run_script/sample_stat_model_acc.sh [dataset]
+run_script/sample_stat_model_acc.sh [dataset]
 ```
 The result of model accuracy can be found in the directory ```result_[dataset]/models_acc_sample/summary.csv```
 
 ### 5. Generate Adversarial Examples
 - Initial adversarial examples saving directory and create adversarial examples generation script
 ```Bash
-bash run_script/sample_stat_model_acc.sh [dataset]
+run_script/sample_stat_model_acc.sh [dataset]
 ```
 
 - Generate the adversarial examples
